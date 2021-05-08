@@ -1,21 +1,40 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import UseForm from "../../customHooks/customFormHook";
 
-const form = () => {
-  const registerComplete = () => {
-    console.log(
-      "Name:",
-      inputs.firstname + " " + inputs.lastname,
-      "Email:",
-      inputs.email,
-      "Password:",
-      inputs.password
-    );
+const Form = () => {
+  const registerComplete = (status) => {
+    if (status === "success") {
+      fetchUsers();
+    }
   };
+
+  const [users, setUsers] = useState([]);
   const { inputs, handleInputChange, handleSubmit } = UseForm(registerComplete);
+
+  const fetchUsers = () => {
+    axios
+      .get("http://localhost:4200/getUserData")
+      .then((res) => setUsers(res.data.payload.data))
+      .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const onFormSubmit = (event) => {
+    if (event.target.password.value === event.target.confirmPassword.value) {
+      handleSubmit(event);
+    } else {
+      event.preventDefault();
+      alert("Password Mismatch");
+    }
+  };
+
   return (
     <div>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={onFormSubmit} method="POST">
         <div>
           <label>Firstname: </label>
           <input
@@ -74,4 +93,4 @@ const form = () => {
   );
 };
 
-export default form;
+export default Form;
