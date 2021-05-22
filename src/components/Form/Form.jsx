@@ -1,48 +1,23 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
-import UseForm from "../../customHooks/customFormHook";
-
-const Form = () => {
-  const registerComplete = (status) => {
-    if (status === "success") {
-      fetchUsers();
-    }
-  };
-
-  const [users, setUsers] = useState([]);
-  const { inputs, handleInputChange, handleSubmit } = UseForm(registerComplete);
-
-  const fetchUsers = () => {
-    axios
-      .get("http://localhost:4200/getUserData")
-      .then((res) => setUsers(res.data.payload.data))
-      .catch((err) => console.log(err));
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const onFormSubmit = (event) => {
-    if (event.target.password.value === event.target.confirmPassword.value) {
-      handleSubmit(event);
-    } else {
-      event.preventDefault();
-      alert("Password Mismatch");
-    }
-  };
-
+const Form = (props) => {
   return (
     <div>
-      <form onSubmit={onFormSubmit} method="POST">
+      <form
+        onSubmit={props.isEdit ? props.handleEdit : props.handleSubmit}
+        method="POST"
+      >
+        {props.isEdit && props.inputs.id ? (
+          <div>
+            <input type="hidden" name="id" value={props.inputs.id} />
+          </div>
+        ) : null}
         <div>
           <label>Firstname: </label>
           <input
             type="text"
             name="firstname"
             placeholder="Enter Firstname"
-            onChange={handleInputChange}
-            value={inputs.firstname}
+            onChange={props.onInputChange}
+            value={props.inputs.firstname}
           />
         </div>
         <div>
@@ -51,8 +26,8 @@ const Form = () => {
             type="text"
             name="lastname"
             placeholder="Enter Lastname"
-            onChange={handleInputChange}
-            value={inputs.lastname}
+            onChange={props.onInputChange}
+            value={props.inputs.lastname}
           />
         </div>
         <div>
@@ -61,8 +36,8 @@ const Form = () => {
             type="email"
             name="email"
             placeholder="Enter Email"
-            onChange={handleInputChange}
-            value={inputs.email}
+            onChange={props.onInputChange}
+            value={props.inputs.email}
           />
         </div>
         <div>
@@ -71,8 +46,8 @@ const Form = () => {
             type="password"
             name="password"
             placeholder="Enter Password"
-            onChange={handleInputChange}
-            value={inputs.password}
+            onChange={props.onInputChange}
+            value={props.inputs.password}
           />
         </div>
         <div>
@@ -81,12 +56,16 @@ const Form = () => {
             type="password"
             name="confirmPassword"
             placeholder="Confirm Password"
-            onChange={handleInputChange}
-            value={inputs.confirmPassword}
+            onChange={props.onInputChange}
+            value={props.inputs.confirmPassword}
           />
         </div>
         <div>
-          <button type="submit">Register</button>
+          {props.isEdit ? (
+            <button type="submit">Edit</button>
+          ) : (
+            <button type="submit">Register</button>
+          )}
         </div>
       </form>
     </div>

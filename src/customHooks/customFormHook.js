@@ -7,7 +7,7 @@ const useForm = (callback) => {
     if (event) {
       event.preventDefault();
       axios
-        .post("http://localhost:4200/saveUserData", {
+        .post("http://localhost:4200/createUser", {
           firstname: event.target.firstname.value,
           lastname: event.target.lastname.value,
           email: event.target.email.value,
@@ -16,12 +16,52 @@ const useForm = (callback) => {
         .then(
           (response) => {
             console.log(response);
+            setInputs((inputs) => ({
+              ...inputs,
+              firstname: "",
+              lastname: "",
+              email: "",
+              password: "",
+              confirmPassword: "",
+            }));
+            callback("success");
           },
           (error) => {
             console.log(error);
           }
         );
-      callback("Success");
+    } else {
+      callback("failure");
+    }
+  };
+  const handleEdit = (event) => {
+    if (event) {
+      event.preventDefault();
+      axios
+        .post(`http://localhost:4200/saveUser/${event.target.id.value}`, {
+          firstname: event.target.firstname.value,
+          lastname: event.target.lastname.value,
+          email: event.target.email.value,
+          password: event.target.password.value,
+        })
+        .then(
+          (response) => {
+            console.log(response);
+            setInputs((inputs) => ({
+              ...inputs,
+              id: "",
+              firstname: "",
+              lastname: "",
+              email: "",
+              password: "",
+              confirmPassword: "",
+            }));
+            callback("edit success");
+          },
+          (error) => {
+            console.log(error);
+          }
+        );
     } else {
       callback("failure");
     }
@@ -32,7 +72,21 @@ const useForm = (callback) => {
       [event.target.name]: event.target.value,
     }));
   };
+  const handlePrefill = (response) => {
+    if (response) {
+      setInputs((inputs) => ({
+        ...inputs,
+        id: response.id,
+        firstname: response.firstname,
+        lastname: response.lastname,
+        email: response.email,
+        password: response.password,
+      }));
+    }
+  };
   return {
+    handlePrefill,
+    handleEdit,
     handleSubmit,
     handleInputChange,
     inputs,
